@@ -114,7 +114,7 @@ exports.handler = async (event) => {
     // We prepend the system prompt as a "user" turn with a "model" acknowledgment
     // because Gemini 1.5 Flash supports system_instruction natively
     const geminiBody = {
-      system_instruction: {
+      systemInstruction: {
         parts: [{ text: GUEE_GYM_SYSTEM_PROMPT }],
       },
       contents: messages.map((msg) => ({

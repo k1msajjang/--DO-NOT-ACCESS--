@@ -113,14 +113,23 @@ exports.handler = async (event) => {
     // Build Gemini request
     // We prepend the system prompt as a "user" turn with a "model" acknowledgment
     // because Gemini 1.5 Flash supports system_instruction natively
-    const geminiBody = {
-      systemInstruction: {
+    const contents = [
+      {
+        role: "user",
         parts: [{ text: GUEE_GYM_SYSTEM_PROMPT }],
       },
-      contents: messages.map((msg) => ({
+      {
+        role: "model",
+        parts: [{ text: "Got it! I am ready to help as the Guee Gym AI assistant." }],
+      },
+      ...messages.map((msg) => ({
         role: msg.role === "assistant" ? "model" : "user",
         parts: [{ text: msg.content }],
       })),
+    ];
+
+    const geminiBody = {
+      contents,
       generationConfig: {
         temperature: 0.7,
         maxOutputTokens: 512,
@@ -128,13 +137,13 @@ exports.handler = async (event) => {
     };
 
     const response = await fetch(
-     `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
-  {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(geminiBody),
-  }
-);
+      `https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(geminiBody),
+      }
+    );
 
     if (!response.ok) {
       const errorText = await response.text();
